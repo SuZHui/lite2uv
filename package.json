@@ -5,6 +5,7 @@
   "description": "lite vue demo",
   "main": "index.js",
   "scripts": {
+    "dev": "node scripts/dev.js",
     "lint": "eslint --ext .ts packages/*/src/**.ts",
     "test": "jest"
   },
@@ -21,8 +22,10 @@
   "devDependencies": {
     "@types/jest": "^27.4.1",
     "@typescript-eslint/parser": "^5.17.0",
+    "esbuild": "^0.14.31",
     "eslint": "^8.12.0",
     "jest": "^27.5.1",
+    "minimist": "^1.2.6",
     "rollup": "^2.70.1",
     "ts-jest": "^27.1.4",
     "typescript": "^4.6.3"
