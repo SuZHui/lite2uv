@@ -1,0 +1,15 @@
+{
+  "name": "@lite2uv/shared",
+  "version": "0.0.1",
+  "description": "internal utils shared across @lite2uv packages",
+  "main": "index.js",
+  "buildOptions": {
+    "formats": [
+      "esm-bundler",
+      "cjs"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
