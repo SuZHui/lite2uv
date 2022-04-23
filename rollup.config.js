@@ -1,7 +1,12 @@
 import path from 'path'
+import ts from 'rollup-plugin-typescript2'
 
-// TODO: 需要打包的包名通过process.env.TARGET获取
-const TARGET = ''
+if (!process.env.TARGET) {
+  throw new Error('TARGET package must be specified via --environment flag.')
+}
+
+// 需要打包的包名通过process.env.TARGET获取
+const TARGET = process.env.TARGET
 
 const packagesDir =path.resolve(__dirname, 'packages')
 const packageDir = path.resolve(packagesDir, TARGET)
@@ -52,13 +57,28 @@ function createConfig(format, output, plugins = []) {
     process.exit(1)
   }
 
+  const tsPlugin = ts({
+    check: false,
+    tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+    cacheRoot: path.resolve(__dirname, 'node_modules/.rts2_cache'),
+    tsconfigOverride: {
+      // compilerOptions: {
+      //   sourceMap: output.sourcemap,
+      //   declaration: shouldEmitDeclarations,
+      //   declarationMap: shouldEmitDeclarations
+      // },
+      exclude: ['**/__tests__', 'test-dts']
+    }
+  })
+
   const entryFile = `src/index.ts`
 
   return {
     input: resolve(entryFile),
-    plugins: {
+    plugins: [
+      tsPlugin,
       ...plugins
-    },
+    ],
     output
   }
 }
