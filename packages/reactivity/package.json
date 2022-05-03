@@ -1,5 +1,5 @@
 {
-  "name": "reactivity",
+  "name": "@lite2uv/reactivity",
   "version": "0.0.1",
   "description": "@lite2uv/reactivity",
   "main": "index.js",
@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "suzh",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@lite2uv/shared": "workspace:^0.0.1"
+  }
 }

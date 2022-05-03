@@ -1,4 +1,5 @@
-import { Target, ReactiveFlags, reactiveMap } from './reactive'
+import { Target, ReactiveFlags, reactiveMap, reactive } from './reactive'
+import { isObject } from '@lite2uv/shared'
 
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Target, key: string | symbol, receiver: object) {
@@ -31,6 +32,10 @@ function createGetter(isReadonly = false, shallow = false) {
     const res = Reflect.get(target, key, receiver)
     
     // TODO: ref获取
+
+    if (isObject(res)) {
+      return reactive(res)// isReadonly ? 
+    }
     
     return res
   }

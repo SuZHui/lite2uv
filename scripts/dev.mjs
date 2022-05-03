@@ -5,13 +5,19 @@
 // 开发模式使用esbuild是为了更快的构建速度
 // 在生产模式中使用rollup是为了生成更小的文件，更好的tree-shaking
 
-const { build } = require('esbuild')
-const { resolve, relative } = require('path')
-const args = require('minimist')(process.argv.slice(2))
+import { build } from 'esbuild'
+import { resolve, relative } from 'path'
+import { readFile } from 'fs/promises'
+import argv from 'minimist'
+import * as url from 'url'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
+const args = argv(process.argv.slice(2))
 // TODO: 暂时写死reactivity包
-const target = args._[0] || 'vue'
+const target = args._[0] || 'lite2uv'
 const format = args.f || 'global'
-const pkg = require(resolve(__dirname, '../packages', target, 'package.json'))
+
+const pkg = JSON.parse(await readFile(resolve(__dirname, '../packages', target, 'package.json')))
 
 // resolve output
 const outputFormat = format.startsWith('global')
