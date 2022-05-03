@@ -1,3 +1,5 @@
+import { mutableHandlers } from './baseHandlers'
+
 export const enum ReactiveFlags {
   SKIP = '__v_skip',
   IS_REACTIVE = '__v_isReactive',
@@ -14,14 +16,27 @@ export interface Target {
   [ReactiveFlags.RAW]?: any
 }
 
-function createReactiveObject(target: Target): any {
-  const proxy = new Proxy(target, {})
+// { reactive(obj) : obj }
+export const reactiveMap = new WeakMap<Target, any>()
+
+function createReactiveObject(
+  target: Target,
+  isReadonly: boolean,
+  baseHandlers: ProxyHandler<any>,
+  proxyMap: WeakMap<Target, any>
+): any {
+  const proxy = new Proxy(target, baseHandlers)
   return proxy
 }
 
 export function reactive<T extends object>(target: T) {
   if (isReadonly(target)) return target
-  return createReactiveObject(target)
+  return createReactiveObject(
+    target,
+    false,
+    mutableHandlers,
+    reactiveMap
+  )
 }
 
 export function isReactive (value: unknown): boolean {
