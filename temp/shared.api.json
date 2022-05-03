@@ -172,6 +172,87 @@
       "members": [
         {
           "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!extend:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "extend: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    <T, U>(target: T, source: U): T & U;\n    <T_1, U_1, V>(target: T_1, source1: U_1, source2: V): T_1 & U_1 & V;\n    <T_2, U_2, V_1, W>(target: T_2, source1: U_2, source2: V_1, source3: W): T_2 & U_2 & V_1 & W;\n    (target: object, ...sources: any[]): any;\n}"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "extend",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!hasOwn:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "hasOwn: "
+            },
+            {
+              "kind": "Content",
+              "text": "(val: object, key: string | symbol) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "key",
+              "canonicalReference": "@lite2uv/shared!~key"
+            },
+            {
+              "kind": "Content",
+              "text": " is never"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "hasOwn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isArray:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isArray: "
+            },
+            {
+              "kind": "Content",
+              "text": "(arg: any) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "arg",
+              "canonicalReference": "@lite2uv/shared!~arg"
+            },
+            {
+              "kind": "Content",
+              "text": " is any[]"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isArray",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@lite2uv/shared!isObject:var",
           "docComment": "",
           "excerptTokens": [

@@ -5,6 +5,20 @@
 ```ts
 
 // @public (undocumented)
+export const extend: {
+    <T, U>(target: T, source: U): T & U;
+    <T_1, U_1, V>(target: T_1, source1: U_1, source2: V): T_1 & U_1 & V;
+    <T_2, U_2, V_1, W>(target: T_2, source1: U_2, source2: V_1, source3: W): T_2 & U_2 & V_1 & W;
+    (target: object, ...sources: any[]): any;
+};
+
+// @public (undocumented)
+export const hasOwn: (val: object, key: string | symbol) => key is never;
+
+// @public (undocumented)
+export const isArray: (arg: any) => arg is any[];
+
+// @public (undocumented)
 export const isObject: (val: unknown) => val is Record<any, any>;
 
 // (No @packageDocumentation comment for this package)

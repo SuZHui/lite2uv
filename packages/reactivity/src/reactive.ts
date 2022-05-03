@@ -49,3 +49,12 @@ export function isReactive (value: unknown): boolean {
 export function isReadonly(value: unknown): boolean {
   return !!(value && (value as Target)[ReactiveFlags.IS_READONLY])
 }
+
+export function isShallow(value: unknown): boolean {
+  return !!(value && (value as Target)[ReactiveFlags.IS_SHALLOW])
+}
+
+export function toRaw<T>(observed: T): T {
+  const raw = observed && (observed as Target)[ReactiveFlags.RAW]
+  return raw ? toRaw(raw) : observed
+}

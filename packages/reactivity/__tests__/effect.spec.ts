@@ -9,13 +9,13 @@ describe('reactivity/effect', () => {
   })
 
   // 可监听对象基础属性的变化
-  it.skip('should observe basic properties', () => {
-    // let dummy
-    // const counter = reactive({ num: 0 })
-    // effect(() => (dummy = counter.num))
+  it('should observe basic properties', () => {
+    let dummy
+    const counter = reactive({ num: 0 })
+    effect(() => (dummy = counter.num))
 
-    // expect(dummy).toBe(0)
-    // counter.num = 7
-    // expect(dummy).toBe(7)
+    expect(dummy).toBe(0)
+    counter.num = 7
+    expect(dummy).toBe(7)
   })
 })

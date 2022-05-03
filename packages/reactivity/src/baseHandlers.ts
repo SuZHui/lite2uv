@@ -1,5 +1,9 @@
-import { Target, ReactiveFlags, reactiveMap, reactive } from './reactive'
+import { Target, ReactiveFlags, reactiveMap, reactive, isReadonly, isShallow, toRaw } from './reactive'
+import { TrackOpTypes } from './operations'
+import { isRef } from './ref'
 import { isObject } from '@lite2uv/shared'
+
+const get = createGetter()
 
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Target, key: string | symbol, receiver: object) {
@@ -28,6 +32,10 @@ function createGetter(isReadonly = false, shallow = false) {
     }
     // TODO: collection获取
 
+    if (!isReadonly) {
+      // TODO: track 
+    }
+
     // 其它key的获取
     const res = Reflect.get(target, key, receiver)
     
@@ -41,11 +49,41 @@ function createGetter(isReadonly = false, shallow = false) {
   }
 }
 
-const get = createGetter()
+const set = createSetter()
+function createSetter(shallow = false) {
+  return function set(
+    target: object,
+    key: string | symbol,
+    value: unknown,
+    receiver: object
+  ): boolean {
+    let oldValue = (target as any)[key]
+    if (isReadonly(oldValue) && isRef(oldValue) && !isRef(value)) {
+      // 往reactive对象中设置值，如果原属性是ref且是只读 同时新值不是ref 新值无法赋值成功
+      return false
+    }
+    if (!shallow && !isReadonly(value)) {
+      if (!isShallow(value)) {
+        value = toRaw(value)
+        oldValue = toRaw(oldValue)
+      }
+      // TODO: if not array
+    } else {
+      // in shallow mode, objects are set as-is regardless of reactive or not
+    }
+
+    const result = Reflect.set(target, key, value, receiver)
+    // TODO: trigger
+
+    return result
+  }
+}
+
+
 
 export const mutableHandlers: ProxyHandler<object> = {
   get,
-  // set,
+  set,
   // deleteProperty,
   // has,
   // ownKeys
