@@ -1,10 +1,13 @@
 {
   "name": "@lite2uv/shared",
   "version": "0.0.1",
-  "description": "",
+  "description": "internal utils shared across @lite2uv packages",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "buildOptions": {
+    "formats": [
+      "esm-bundler",
+      "cjs"
+    ]
   },
   "keywords": [],
   "author": "",
