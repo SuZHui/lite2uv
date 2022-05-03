@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "internal utils shared across @lite2uv packages",
   "main": "index.js",
+  "types": "dist/shared.d.ts",
   "buildOptions": {
     "formats": [
       "esm-bundler",

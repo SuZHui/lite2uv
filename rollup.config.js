@@ -11,7 +11,11 @@ const TARGET = process.env.TARGET
 const packagesDir =path.resolve(__dirname, 'packages')
 const packageDir = path.resolve(packagesDir, TARGET)
 const resolve = p => path.resolve(packageDir, p)
+const pkg = require(resolve(`package.json`))
 const name = path.basename(packageDir)
+
+// ensure TS checks only once for each build
+let hasTSChecked = false
 
 const outputConfig = {
   'esm-bundler': {
@@ -57,16 +61,21 @@ function createConfig(format, output, plugins = []) {
     process.exit(1)
   }
 
+  output.sourcemap = !!process.env.SOURCE_MA
+
+  const shouldEmitDeclarations =
+    pkg.types && process.env.TYPES != null && !hasTSChecked
+
   const tsPlugin = ts({
     check: false,
     tsconfig: path.resolve(__dirname, 'tsconfig.json'),
     cacheRoot: path.resolve(__dirname, 'node_modules/.rts2_cache'),
     tsconfigOverride: {
-      // compilerOptions: {
-      //   sourceMap: output.sourcemap,
-      //   declaration: shouldEmitDeclarations,
-      //   declarationMap: shouldEmitDeclarations
-      // },
+      compilerOptions: {
+        sourceMap: output.sourcemap,
+        declaration: shouldEmitDeclarations,
+        declarationMap: shouldEmitDeclarations
+      },
       exclude: ['**/__tests__', 'test-dts']
     }
   })
