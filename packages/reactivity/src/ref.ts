@@ -1,4 +1,6 @@
-import { toReactive } from './reactive'
+import { hasChanged } from '@lite2uv/shared'
+import { toReactive, toRaw } from './reactive'
+import { trackEffects } from './effect'
 
 declare const RefSymbol: unique symbol
 
@@ -10,6 +12,21 @@ export interface Ref<T = any> {
    * autocomplete, so we use a private Symbol instead.
    */
   [RefSymbol]: true
+}
+
+export function trackRefValue(ref: RefBase<any>) {
+  if (shouldTrack && activeEffect) {
+    ref = toRaw(ref)
+    if (__DEV__) {
+      trackEffects(ref.dep || (ref.dep = createDep()), {
+        target: ref,
+        type: TrackOpTypes.GET,
+        key: 'value'
+      })
+    } else {
+      trackEffects(ref.dep || (ref.dep = createDep()))
+    }
+  }
 }
 
 export function isRef<T>(r: Ref<T> | unknown): r is Ref<T>
@@ -30,15 +47,16 @@ function createRef(rawValue: unknown, shallow: boolean) {
 
 class RefImpl<T> {
   private _value: T
-  // private _rawValue: T
+  private _rawValue: T
 
   // public dep?: Dep = undefined
   // public readonly __v_isRef = true
 
   constructor(value: T, public readonly __v_isShallow: boolean) {
-    // TODO:  this._rawValue = __v_isShallow ? value : toRaw(value)
+    this._rawValue = __v_isShallow ? value : toRaw(value)
     this._value = __v_isShallow ? value : toReactive(value)
   }
+
   get value() {
     //TODO trackRefValue(this)
     return this._value
@@ -46,10 +64,10 @@ class RefImpl<T> {
 
   set value(newVal) {
     newVal = this.__v_isShallow ? newVal : toRaw(newVal)
-    // if (hasChanged(newVal, this._rawValue)) {
-    //   this._rawValue = newVal
-    //   this._value = this.__v_isShallow ? newVal : toReactive(newVal)
-    //   triggerRefValue(this, newVal)
-    // }
+    if (hasChanged(newVal, this._rawValue)) {
+      this._rawValue = newVal
+      this._value = this.__v_isShallow ? newVal : toReactive(newVal)
+      // TODO triggerRefValue(this, newVal)
+    }
   }
 }

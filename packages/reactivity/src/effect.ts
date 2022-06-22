@@ -1,6 +1,6 @@
 import { extend, isArray } from "@lite2uv/shared"
 import { ComputedRefImpl } from "./computed"
-import { createDep, Dep } from "./dep"
+import { createDep, Dep, newTracked, wasTracked } from "./dep"
 import { TrackOpTypes, TriggerOpTypes } from "./operations"
 
 // The main WeakMap that stores {target -> key -> dep} connections.
@@ -9,6 +9,21 @@ import { TrackOpTypes, TriggerOpTypes } from "./operations"
 // raw Sets to reduce memory overhead.
 type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
+
+// The number of effects currently being tracked recursively.
+// 当前effects递归的深度
+let effectTrackDepth = 0
+
+export let trackOpBit = 1
+
+/**
+ * @link https://www.zhihu.com/question/62732293 what is SMI
+ *
+ * The bitwise track markers support at most 30 levels of recursion.
+ * This value is chosen to enable modern JS engines to use a SMI on all platforms.
+ * When recursion depth is greater, fall back to using a full cleanup.
+ */
+const maxMarkerBits = 30
 
 export type EffectScheduler = (...args: any[]) => any
 
@@ -30,6 +45,8 @@ export let activeEffect: ReactiveEffect | undefined
 export const ITERATE_KEY = Symbol(__DEV__ ? 'iterate' : '')
 
 export class ReactiveEffect<T = any> {
+  active = true
+  deps: Dep[] = []
   /**
    * Can be attached after creation
    * @internal
@@ -63,6 +80,30 @@ export class ReactiveEffect<T = any> {
 export function effect<T = any>(fn: () => T) {
   const _effect = new ReactiveEffect(fn)
   _effect.run()
+}
+
+export function trackEffects(dep: Dep, debuggerEventExtraInfo?: DebuggerEventExtraInfo) {
+  let shouldTrack = false
+  if (effectTrackDepth <= maxMarkerBits) {
+    if (!newTracked(dep)) {
+      dep.n |= trackOpBit // set newly tracked
+      shouldTrack = !wasTracked(dep)
+    }
+  } else {
+    // Full cleanup mode.
+    shouldTrack = !dep.has(activeEffect!)
+  }
+
+  if (shouldTrack) {
+    dep.add(activeEffect!)
+    activeEffect!.deps.push(dep)
+    if (__DEV__ && activeEffect!.onTrack) {
+      activeEffect!.onTrack({
+        effect: activeEffect!,
+        ...debuggerEventExtraInfo!
+      })
+    }
+  }
 }
 
 // 依赖收集

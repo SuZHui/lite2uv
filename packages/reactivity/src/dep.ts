@@ -1,4 +1,4 @@
-import { ReactiveEffect } from "./effect"
+import { ReactiveEffect, trackOpBit } from "./effect"
 
 export type Dep = Set<ReactiveEffect> & TrackedMarkers
 
@@ -24,3 +24,7 @@ export const createDep = (effects?: ReactiveEffect[]): Dep => {
   dep.n = 0
   return dep
 }
+
+export const wasTracked = (dep: Dep): boolean => (dep.w & trackOpBit) > 0
+
+export const newTracked = (dep: Dep): boolean => (dep.n & trackOpBit) > 0
