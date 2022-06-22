@@ -1,3 +1,4 @@
+import { isObject } from '@lite2uv/shared'
 import { mutableHandlers } from './baseHandlers'
 
 export const enum ReactiveFlags {
@@ -25,7 +26,21 @@ function createReactiveObject(
   baseHandlers: ProxyHandler<any>,
   proxyMap: WeakMap<Target, any>
 ): any {
+  // target is already a Proxy, return it.
+  // exception: calling readonly() on a reactive object
+  if (
+    target[ReactiveFlags.RAW] &&
+    !(isReadonly && target[ReactiveFlags.IS_REACTIVE])
+  ) {
+    return target
+  }
+  // target already has corresponding Proxy
+  const existingProxy = proxyMap.get(target)
+  if (existingProxy) {
+    return existingProxy
+  }
   const proxy = new Proxy(target, baseHandlers)
+  proxyMap.set(target, proxy)
   return proxy
 }
 
@@ -58,3 +73,5 @@ export function toRaw<T>(observed: T): T {
   const raw = observed && (observed as Target)[ReactiveFlags.RAW]
   return raw ? toRaw(raw) : observed
 }
+
+export const toReactive = <T extends unknown>(value: T) => isObject(value) ? reactive(value) : value

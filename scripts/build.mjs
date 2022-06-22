@@ -1,11 +1,12 @@
+/* eslint-disable no-restricted-syntax */
 import path from 'path'
-import { readFile } from 'fs/promises'
+import { readFile, access } from 'fs/promises'
 import { execa } from 'execa'
 import minimist from 'minimist'
 import fs from 'fs-extra'
 import { ExtractorConfig, Extractor } from '@microsoft/api-extractor'
-import * as url from 'url'
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+// import * as url from 'url'
+// const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const args = minimist(process.argv.slice(2))
 const targets = args._
@@ -33,7 +34,7 @@ async function build(target) {
     const extractorConfigPath = path.resolve(pkgDir, `api-extractor.json`)
     console.log(`Using extractor config: ${extractorConfigPath}`)
 
-    const extractorConfig = 
+    const extractorConfig =
       ExtractorConfig.loadFileAndPrepare(extractorConfigPath)
     const extractorResult = Extractor.invoke(extractorConfig, {
       localBuild: true,
@@ -43,7 +44,7 @@ async function build(target) {
     if (extractorResult.succeeded) {
       // concat additional d.ts to rolled-up dts
       const typesDir = path.resolve(pkgDir, 'types')
-      if (await fs.exists(typesDir)) {
+      if (await access(typesDir)) {
         const dtsPath = path.resolve(pkgDir, pkg.types)
         const existing = await fs.readFile(dtsPath, 'utf-8')
         const typeFiles = await fs.readdir(typesDir)
