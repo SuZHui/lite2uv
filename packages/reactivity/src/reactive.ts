@@ -19,6 +19,19 @@ export interface Target {
 
 // { reactive(obj) : obj }
 export const reactiveMap = new WeakMap<Target, any>()
+export const shallowReactiveMap = new WeakMap<Target, any>()
+export const readonlyMap = new WeakMap<Target, any>()
+export const shallowReadonlyMap = new WeakMap<Target, any>()
+
+export function reactive<T extends object>(target: T) {
+  if (isReadonly(target)) return target
+  return createReactiveObject(
+    target,
+    false,
+    mutableHandlers,
+    reactiveMap
+  )
+}
 
 function createReactiveObject(
   target: Target,
@@ -42,16 +55,6 @@ function createReactiveObject(
   const proxy = new Proxy(target, baseHandlers)
   proxyMap.set(target, proxy)
   return proxy
-}
-
-export function reactive<T extends object>(target: T) {
-  if (isReadonly(target)) return target
-  return createReactiveObject(
-    target,
-    false,
-    mutableHandlers,
-    reactiveMap
-  )
 }
 
 export function isReactive (value: unknown): boolean {

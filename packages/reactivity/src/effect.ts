@@ -14,6 +14,7 @@ const targetMap = new WeakMap<any, KeyToDepMap>()
 // 当前effects递归的深度
 let effectTrackDepth = 0
 
+// ReactiveEffect.run时会更新该操作位
 export let trackOpBit = 1
 
 /**
@@ -82,15 +83,22 @@ export function effect<T = any>(fn: () => T) {
   _effect.run()
 }
 
+export let shouldTrack = true
+
 export function trackEffects(dep: Dep, debuggerEventExtraInfo?: DebuggerEventExtraInfo) {
   let shouldTrack = false
+  // 如果当前依赖收集的深度未达到最大深度
   if (effectTrackDepth <= maxMarkerBits) {
+    // 如果没有依赖没有新的跟踪
     if (!newTracked(dep)) {
-      dep.n |= trackOpBit // set newly tracked
+      // 为其设置新的依赖跟踪，相当于重置为0
+      dep.n |= trackOpBit
+      // 如果没有被跟踪项 为true
       shouldTrack = !wasTracked(dep)
     }
   } else {
     // Full cleanup mode.
+    // 依赖中不包含当前的effect才进行跟踪操作
     shouldTrack = !dep.has(activeEffect!)
   }
 

@@ -1,7 +1,20 @@
-import { Target, ReactiveFlags, reactiveMap, reactive, isReadonly, isShallow, toRaw } from './reactive'
+import { Target, ReactiveFlags, reactiveMap, shallowReactiveMap, shallowReadonlyMap, readonlyMap, reactive, isReadonly, isShallow, toRaw } from './reactive'
 import { TrackOpTypes } from './operations'
 import { isRef } from './ref'
-import { isObject } from '@lite2uv/shared'
+import { hasChanged, hasOwn, isArray, isIntegerKey, isObject, isSymbol, makeMap } from '@lite2uv/shared'
+
+const isNonTrackableKeys = /*#__PURE__*/ makeMap(`__proto__,__v_isRef,__isVue`)
+
+const builtInSymbols = new Set(
+  /*#__PURE__*/
+  Object.getOwnPropertyNames(Symbol)
+    // ios10.x Object.getOwnPropertyNames(Symbol) can enumerate 'arguments' and 'caller'
+    // but accessing them on Symbol leads to TypeError because Symbol is a strict mode
+    // function
+    .filter(key => key !== 'arguments' && key !== 'caller')
+    .map(key => (Symbol as any)[key])
+    .filter(isSymbol)
+)
 
 const get = createGetter()
 
@@ -21,35 +34,51 @@ function createGetter(isReadonly = false, shallow = false) {
       receiver ===
       (isReadonly
         ? shallow
-          ? new WeakMap()
-          : new WeakMap()
+          ? shallowReadonlyMap
+          : readonlyMap
         : shallow
-          ? new WeakMap()
+          ? shallowReactiveMap
           : reactiveMap
       ).get(target)
     ) {
       return target
     }
     // TODO: collection获取
+    const targetIsArray = isArray(target)
 
+    // 其它key的获取
+    const res = Reflect.get(target, key, receiver)
+
+    // 如果是环境内置symbol key 或 __proto__,__v_isRef,__isVue 直接返回
+    if (isSymbol(key) ? builtInSymbols.has(key) : isNonTrackableKeys(key)) {
+      return res
+    }
+
+    // 非只读模式下需要收集依赖
     if (!isReadonly) {
       // TODO: track 
     }
 
-    // 其它key的获取
-    const res = Reflect.get(target, key, receiver)
-    
-    // TODO: ref获取
+    if (shallow) {
+      return res
+    }
+
+    if (isRef(res)) {
+      // ref unwrapping - skip unwrap for Array + integer key.
+      return targetIsArray && isIntegerKey(key) ? res : res.value
+    }
 
     if (isObject(res)) {
-      return reactive(res)// isReadonly ? 
+      // readonly TODO
+      return isReadonly ? res : reactive(res)// isReadonly ?
     }
-    
+
     return res
   }
 }
 
 const set = createSetter()
+
 function createSetter(shallow = false) {
   return function set(
     target: object,
@@ -67,13 +96,34 @@ function createSetter(shallow = false) {
         value = toRaw(value)
         oldValue = toRaw(oldValue)
       }
-      // TODO: if not array
+      // 浅响应下 设置的值不是数组也不是ref 且被设置的属性是个ref
+      // 则设置的属性值插入ref.value内
+      if (!isArray(value) && isRef(oldValue) && !isRef(value)) {
+        oldValue.value = value
+        return true
+      }
     } else {
+      // 浅响应下 对象的set操作不需要触发依赖
       // in shallow mode, objects are set as-is regardless of reactive or not
     }
 
+    // 对象是否包含这个key, 通过这个变量判断是add还是update操作
+    const hadKey =
+      isArray(target) && isIntegerKey(key)
+        ? Number(key) < target.length
+        : hasOwn(target, key)
+
     const result = Reflect.set(target, key, value, receiver)
-    // TODO: trigger
+    // 比较receiver和target是否是同一个对象
+    // don't trigger if target is something up in the prototype chain of original
+    if (target === toRaw(receiver)) {
+      // 触发依赖
+      if (!hadKey) {
+        // TODO: trigger(target, TriggerOpTypes.ADD, key, value)
+      } else if (hasChanged(value, oldValue)) {
+        // TODO: trigger(target, TriggerOpTypes.SET, key, value, oldValue)
+      }
+    }
 
     return result
   }

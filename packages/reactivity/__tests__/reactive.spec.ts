@@ -1,6 +1,6 @@
 import { effect } from '../src/effect'
 import { reactive, isReactive, toRaw } from '../src/reactive'
-import { isRef } from '../src/ref'
+import { isRef, ref } from '../src/ref'
 
 describe('reactivity/reactive', () => {
   it('Object', () => {
