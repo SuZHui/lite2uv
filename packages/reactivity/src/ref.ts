@@ -1,8 +1,9 @@
 import { hasChanged } from '@lite2uv/shared'
 import { toReactive, toRaw } from './reactive'
-import { activeEffect, shouldTrack, trackEffects } from './effect'
+import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
 import { createDep, Dep } from './dep'
-import { TrackOpTypes } from './operations'
+import { TrackOpTypes, TriggerOpTypes } from './operations'
+import { CollectionTypes } from './collectionHandlers'
 
 declare const RefSymbol: unique symbol
 
@@ -36,6 +37,23 @@ export function trackRefValue(ref: RefBase<any>) {
   }
 }
 
+// 包装ref的依赖触发
+export function triggerRefValue(ref: RefBase<any>, newVal?: any) {
+  ref = toRaw(ref);
+  if (ref.dep) {
+    if (__DEV__) {
+      triggerEffects(ref.dep, {
+        target: ref,
+        type: TriggerOpTypes.SET,
+        key: 'value',
+        newValue: newVal
+      })
+    } else {
+      triggerEffects(ref.dep)
+    }
+  }
+}
+
 export function isRef<T>(r: Ref<T> | unknown): r is Ref<T>
 export function isRef(r: any): r is Ref {
   return !!(r && r.__v_isRef === true)
@@ -48,6 +66,19 @@ export function ref<T>(value: T): Ref<UnwrapRef<T>>
 export function ref<T = any>(): Ref<T | undefined>
 export function ref(value?: unknown) {
   return createRef(value, false)
+}
+
+declare const ShallowRefMarker: unique symbol
+
+export type ShallowRef<T = any> = Ref<T> & { [ShallowRefMarker]?: true }
+
+export function shallowRef<T extends object>(
+  value: T
+): T extends Ref ? T : ShallowRef<T>
+export function shallowRef<T>(value: T): ShallowRef<T>
+export function shallowRef<T = any>(): ShallowRef<T | undefined>
+export function shallowRef(value?: unknown) {
+  return createRef(value, true)
 }
 
 function createRef(rawValue: unknown, shallow: boolean) {
@@ -80,7 +111,7 @@ class RefImpl<T> {
     if (hasChanged(newVal, this._rawValue)) {
       this._rawValue = newVal
       this._value = this.__v_isShallow ? newVal : toReactive(newVal)
-      // TODO triggerRefValue(this, newVal)
+      triggerRefValue(this, newVal)
     }
   }
 }
