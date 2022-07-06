@@ -130,12 +130,28 @@ function createSetter(shallow = false) {
   }
 }
 
+function deleteProperty(target: object, key: string | symbol): boolean {
+  const hadKey = hasOwn(target, key)
+  const oldValue = (target as any)[key]
+  const result = Reflect.deleteProperty(target, key)
+  if (result && hadKey) {
+    trigger(target, TriggerOpTypes.DELETE, key, undefined, oldValue)
+  }
+  return result
+}
 
+function has(target: object, key: string | symbol): boolean {
+  const result = Reflect.has(target, key)
+  if (!isSymbol(key) || !builtInSymbols.has(key)) {
+    track(target, TrackOpTypes.HAS, key)
+  }
+  return result
+}
 
 export const mutableHandlers: ProxyHandler<object> = {
   get,
   set,
-  // deleteProperty,
-  // has,
+  deleteProperty,
+  has,
   // ownKeys
 }
