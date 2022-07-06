@@ -112,7 +112,7 @@ describe('reactivity/reactive', () => {
     expect('foo' in original).toBe(false)
   })
 
-  test('original value change should reflect in observed value (Object)', () => {
+  it('original value change should reflect in observed value (Object)', () => {
     const original: any = { foo: 1 }
     const observed = reactive(original)
     // set
@@ -125,7 +125,7 @@ describe('reactivity/reactive', () => {
     expect('foo' in observed).toBe(false)
   })
 
-  test('setting a property with an unobserved value should wrap with reactive', () => {
+  it('setting a property with an unobserved value should wrap with reactive', () => {
     const observed = reactive<{ foo?: object }>({})
     const raw = {}
     observed.foo = raw
@@ -133,21 +133,21 @@ describe('reactivity/reactive', () => {
     expect(isReactive(observed.foo)).toBe(true)
   })
 
-  test('observing already observed value should return same Proxy', () => {
+  it('observing already observed value should return same Proxy', () => {
     const original = { foo: 1 }
     const observed = reactive(original)
     const observed2 = reactive(observed)
     expect(observed2).toBe(observed)
   })
 
-  test('observing the same value multiple times should return same Proxy', () => {
+  it('observing the same value multiple times should return same Proxy', () => {
     const original = { foo: 1 }
     const observed = reactive(original)
     const observed2 = reactive(original)
     expect(observed2).toBe(observed)
   })
 
-  test('should not pollute original object with Proxies', () => {
+  it('should not pollute original object with Proxies', () => {
     const original: any = { foo: 1 }
     const original2 = { bar: 2 }
     const observed = reactive(original)
@@ -157,7 +157,7 @@ describe('reactivity/reactive', () => {
     expect(original.bar).toBe(original2)
   })
 
-  test('toRaw', () => {
+  it('toRaw', () => {
     const original = { foo: 1 }
     const observed = reactive(original)
     expect(toRaw(observed)).toBe(original)
@@ -172,7 +172,7 @@ describe('reactivity/reactive', () => {
     expect(raw).not.toBe(toRaw(original))
   })
 
-  test('should not unwrap Ref<T>', () => {
+  it.skip('should not unwrap Ref<T>', () => {
     const observedNumberRef = reactive(ref(1))
     const observedObjectRef = reactive(ref({ foo: 1 }))
 

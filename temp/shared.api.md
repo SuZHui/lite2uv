@@ -13,13 +13,37 @@ export const extend: {
 };
 
 // @public (undocumented)
+export const hasChanged: (value: any, oldValue: any) => boolean;
+
+// @public (undocumented)
 export const hasOwn: (val: object, key: string | symbol) => key is never;
 
 // @public (undocumented)
 export const isArray: (arg: any) => arg is any[];
 
 // @public (undocumented)
+export const isIntegerKey: (key: unknown) => boolean;
+
+// @public (undocumented)
 export const isObject: (val: unknown) => val is Record<any, any>;
+
+// @public (undocumented)
+export const isString: (val: unknown) => val is string;
+
+// @public (undocumented)
+export const isSymbol: (val: unknown) => val is symbol;
+
+// @public
+export function makeMap(str: string, expectsLowerCase?: boolean): (key: string) => boolean;
+
+// @public (undocumented)
+export const objectToString: () => string;
+
+// @public (undocumented)
+export const toRawType: (value: unknown) => string;
+
+// @public (undocumented)
+export const toTypeString: (value: unknown) => string;
 
 // (No @packageDocumentation comment for this package)
 

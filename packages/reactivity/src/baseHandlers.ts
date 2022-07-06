@@ -1,7 +1,8 @@
 import { Target, ReactiveFlags, reactiveMap, shallowReactiveMap, shallowReadonlyMap, readonlyMap, reactive, isReadonly, isShallow, toRaw } from './reactive'
-import { TrackOpTypes } from './operations'
+import { TrackOpTypes, TriggerOpTypes } from './operations'
 import { isRef } from './ref'
 import { hasChanged, hasOwn, isArray, isIntegerKey, isObject, isSymbol, makeMap } from '@lite2uv/shared'
+import { trigger, track } from './effect'
 
 const isNonTrackableKeys = /*#__PURE__*/ makeMap(`__proto__,__v_isRef,__isVue`)
 
@@ -56,7 +57,7 @@ function createGetter(isReadonly = false, shallow = false) {
 
     // 非只读模式下需要收集依赖
     if (!isReadonly) {
-      // TODO: track 
+      track(target, TrackOpTypes.GET, key)
     }
 
     if (shallow) {
@@ -119,9 +120,9 @@ function createSetter(shallow = false) {
     if (target === toRaw(receiver)) {
       // 触发依赖
       if (!hadKey) {
-        // TODO: trigger(target, TriggerOpTypes.ADD, key, value)
+        trigger(target, TriggerOpTypes.ADD, key, value)
       } else if (hasChanged(value, oldValue)) {
-        // TODO: trigger(target, TriggerOpTypes.SET, key, value, oldValue)
+        trigger(target, TriggerOpTypes.SET, key, value, oldValue)
       }
     }
 

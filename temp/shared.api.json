@@ -193,6 +193,27 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!hasChanged:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "hasChanged: "
+            },
+            {
+              "kind": "Content",
+              "text": "(value: any, oldValue: any) => boolean"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "hasChanged",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@lite2uv/shared!hasOwn:var",
           "docComment": "",
           "excerptTokens": [
@@ -253,6 +274,27 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isIntegerKey:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isIntegerKey: "
+            },
+            {
+              "kind": "Content",
+              "text": "(key: unknown) => boolean"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isIntegerKey",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@lite2uv/shared!isObject:var",
           "docComment": "",
           "excerptTokens": [
@@ -288,6 +330,189 @@
           "variableTypeTokenRange": {
             "startIndex": 1,
             "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isString:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isString: "
+            },
+            {
+              "kind": "Content",
+              "text": "(val: unknown) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "val",
+              "canonicalReference": "@lite2uv/shared!~val"
+            },
+            {
+              "kind": "Content",
+              "text": " is string"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isString",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isSymbol:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isSymbol: "
+            },
+            {
+              "kind": "Content",
+              "text": "(val: unknown) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "val",
+              "canonicalReference": "@lite2uv/shared!~val"
+            },
+            {
+              "kind": "Content",
+              "text": " is symbol"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isSymbol",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@lite2uv/shared!makeMap:function(1)",
+          "docComment": "/**\n * Make a map and return a function for checking if a key is in that map. IMPORTANT: all calls of this function must be prefixed with \\/\\*#\\_\\_PURE\\_\\_\\*\\/ So that rollup can tree-shake them if necessary.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function makeMap(str: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", expectsLowerCase?: "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "(key: string) => boolean"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "str",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expectsLowerCase",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "makeMap"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!objectToString:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "objectToString: "
+            },
+            {
+              "kind": "Content",
+              "text": "() => string"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "objectToString",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!toRawType:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "toRawType: "
+            },
+            {
+              "kind": "Content",
+              "text": "(value: unknown) => string"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "toRawType",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!toTypeString:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "toTypeString: "
+            },
+            {
+              "kind": "Content",
+              "text": "(value: unknown) => string"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "toTypeString",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
           }
         }
       ]

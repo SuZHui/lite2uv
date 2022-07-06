@@ -59,11 +59,11 @@ export function isRef(r: any): r is Ref {
   return !!(r && r.__v_isRef === true)
 }
 
-export function ref<T extends object>(
-  value: T
-): [T] extends [Ref] ? T : Ref<UnwrapRef<T>>
-export function ref<T>(value: T): Ref<UnwrapRef<T>>
-export function ref<T = any>(): Ref<T | undefined>
+// export function ref<T extends object>(
+//   value: T
+// ): [T] extends [Ref] ? T : Ref<UnwrapRef<T>>
+// export function ref<T>(value: T): Ref<UnwrapRef<T>>
+export function ref<T = any>(value: T): Ref<T | undefined>
 export function ref(value?: unknown) {
   return createRef(value, false)
 }
@@ -116,24 +116,24 @@ class RefImpl<T> {
   }
 }
 
-export type UnwrapRef<T> = T extends ShallowRef<infer V>
-  ? V
-  : T extends Ref<infer V>
-  ? UnwrapRefSimple<V>
-  : UnwrapRefSimple<T>
+// export type UnwrapRef<T> = T extends ShallowRef<infer V>
+//   ? V
+//   : T extends Ref<infer V>
+//   ? UnwrapRefSimple<V>
+//   : UnwrapRefSimple<T>
 
-  export type UnwrapRefSimple<T> = T extends
-  | Function
-  | CollectionTypes
-  | BaseTypes
-  | Ref
-  | RefUnwrapBailTypes[keyof RefUnwrapBailTypes]
-  | { [RawSymbol]?: true }
-  ? T
-  : T extends Array<any>
-  ? { [K in keyof T]: UnwrapRefSimple<T[K]> }
-  : T extends object & { [ShallowReactiveMarker]?: never }
-  ? {
-      [P in keyof T]: P extends symbol ? T[P] : UnwrapRef<T[P]>
-    }
-  : T
+// export type UnwrapRefSimple<T> = T extends
+//   | Function
+//   | CollectionTypes
+//   | BaseTypes
+//   | Ref
+//   | RefUnwrapBailTypes[keyof RefUnwrapBailTypes]
+//   | { [RawSymbol]?: true }
+//   ? T
+//   : T extends Array<any>
+//   ? { [K in keyof T]: UnwrapRefSimple<T[K]> }
+//   : T extends object & { [ShallowReactiveMarker]?: never }
+//   ? {
+//       [P in keyof T]: P extends symbol ? T[P] : UnwrapRef<T[P]>
+//     }
+//   : T

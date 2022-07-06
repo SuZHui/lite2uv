@@ -1,6 +1,7 @@
 import { extend, isArray } from "@lite2uv/shared"
+import { isMap } from "util/types"
 import { ComputedRefImpl } from "./computed"
-import { createDep, Dep, newTracked, wasTracked } from "./dep"
+import { createDep, Dep, finalizeDepMarkers, initDepMarkers, newTracked, wasTracked } from "./dep"
 import { TrackOpTypes, TriggerOpTypes } from "./operations"
 
 // The main WeakMap that stores {target -> key -> dep} connections.
@@ -48,6 +49,7 @@ export const ITERATE_KEY = Symbol(__DEV__ ? 'iterate' : '')
 export class ReactiveEffect<T = any> {
   active = true
   deps: Dep[] = []
+  parent: ReactiveEffect | undefined = undefined
   /**
    * Can be attached after creation
    * @internal
@@ -74,7 +76,71 @@ export class ReactiveEffect<T = any> {
   ) {}
 
   run() {
-    return this.fn()
+    if (!this.active) {
+      return this.fn()
+    }
+    // 当前激活的effect
+    let parent: ReactiveEffect | undefined = activeEffect
+    // 是否开启依赖收集
+    let lastShouldTrack = shouldTrack
+    while (parent) {
+      if (parent === this) {
+        return
+      }
+      parent = parent.parent
+    }
+    try {
+      // 暂存当前激活的副作用
+      this.parent = activeEffect
+      activeEffect = this
+      shouldTrack = true
+
+      trackOpBit = 1 << ++effectTrackDepth
+
+      if (effectTrackDepth <= maxMarkerBits) {
+        initDepMarkers(this)
+      } else {
+        cleanupEffect(this)
+      }
+      return this.fn()
+    } finally {
+      if (effectTrackDepth <= maxMarkerBits) {
+        finalizeDepMarkers(this)
+      }
+
+      trackOpBit = 1 << --effectTrackDepth
+
+      activeEffect = this.parent
+      shouldTrack = lastShouldTrack
+      this.parent = undefined
+
+      if (this.deferStop) {
+        this.stop()
+      }
+    }
+  }
+
+  stop() {
+    // stopped while running itself - defer the cleanup
+    if (activeEffect === this) {
+      this.deferStop = true
+    } else if (this.active) {
+      cleanupEffect(this)
+      if (this.onStop) {
+        this.onStop()
+      }
+      this.active = false
+    }
+  }
+}
+
+function cleanupEffect(effect: ReactiveEffect) {
+  const { deps } = effect
+  if (deps.length) {
+    for (let i = 0; i < deps.length; i++) {
+      deps[i].delete(effect)
+    }
+    deps.length = 0
   }
 }
 
@@ -84,6 +150,26 @@ export function effect<T = any>(fn: () => T) {
 }
 
 export let shouldTrack = true
+
+// 收集依赖
+export function track(target: object, type: TrackOpTypes, key: unknown) {
+  if (shouldTrack && activeEffect) {
+    let depsMap = targetMap.get(target)
+    if (!depsMap) {
+      targetMap.set(target, (depsMap = new Map()))
+    }
+    let dep = depsMap.get(key)
+    if (!dep) {
+      depsMap.set(key, (dep = createDep()))
+    }
+
+    const eventInfo = __DEV__
+      ? { effect: activeEffect, target, type, key }
+      : undefined
+
+    trackEffects(dep, eventInfo)
+  }
+}
 
 export function trackEffects(dep: Dep, debuggerEventExtraInfo?: DebuggerEventExtraInfo) {
   let shouldTrack = false
@@ -114,7 +200,7 @@ export function trackEffects(dep: Dep, debuggerEventExtraInfo?: DebuggerEventExt
   }
 }
 
-// 依赖收集
+// 触发依赖
 export function trigger(
   target: object,
   type: TriggerOpTypes,
@@ -146,32 +232,38 @@ export function trigger(
           }
           // TODO: array add
           break
+        case TriggerOpTypes.SET:
+          if(isMap(target)) {
+            // 如果是个Map对象，需要收集它的iterate key依赖，用于模拟触发for ... of ...
+            deps.push(depsMap.get(ITERATE_KEY))
+          }
+          break
       }
+  }
 
-      const eventInfo = __DEV__
-      ? { target, type, key, newValue, oldValue, oldTarget }
-      : undefined
+  const eventInfo = __DEV__
+    ? { target, type, key, newValue, oldValue, oldTarget }
+    : undefined
 
-    if (deps.length === 1) {
-      if (deps[0]) {
-        if (__DEV__) {
-          triggerEffects(deps[0], eventInfo)
-        } else {
-          triggerEffects(deps[0])
-        }
-      }
-    } else {
-      const effects: ReactiveEffect[] = []
-      for (const dep of deps) {
-        if (dep) {
-          effects.push(...dep)
-        }
-      }
+  if (deps.length === 1) {
+    if (deps[0]) {
       if (__DEV__) {
-        triggerEffects(createDep(effects), eventInfo)
+        triggerEffects(deps[0], eventInfo)
       } else {
-        triggerEffects(createDep(effects))
+        triggerEffects(deps[0])
       }
+    }
+  } else {
+    const effects: ReactiveEffect[] = []
+    for (const dep of deps) {
+      if (dep) {
+        effects.push(...dep)
+      }
+    }
+    if (__DEV__) {
+      triggerEffects(createDep(effects), eventInfo)
+    } else {
+      triggerEffects(createDep(effects))
     }
   }
 }
