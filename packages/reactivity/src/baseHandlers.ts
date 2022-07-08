@@ -1,8 +1,9 @@
-import { Target, ReactiveFlags, reactiveMap, shallowReactiveMap, shallowReadonlyMap, readonlyMap, reactive, isReadonly, isShallow, toRaw } from './reactive'
+import { Target, ReactiveFlags, reactiveMap, shallowReactiveMap, shallowReadonlyMap, readonlyMap, reactive, isReadonly, isShallow, toRaw, readonly } from './reactive'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
 import { isRef } from './ref'
 import { hasChanged, hasOwn, isArray, isIntegerKey, isObject, isSymbol, makeMap } from '@lite2uv/shared'
-import { trigger, track } from './effect'
+import { trigger, track, ITERATE_KEY, pauseTracking, resetTracking } from './effect'
+import { warn } from './warning'
 
 const isNonTrackableKeys = /*#__PURE__*/ makeMap(`__proto__,__v_isRef,__isVue`)
 
@@ -17,7 +18,46 @@ const builtInSymbols = new Set(
     .filter(isSymbol)
 )
 
-const get = createGetter()
+const get =  /*#__PURE__*/ createGetter()
+const readonlyGet = /*#__PURE__*/ createGetter(true)
+
+const arrayInstrumentations = createArrayInstrumentations()
+
+// 处理集合的依赖收集
+function createArrayInstrumentations() {
+  const instrumentations: Record<string, Function> = {}
+  // instrument identity-sensitive Array methods to account for possible reactive
+  // values
+  ;(['includes', 'indexOf', 'lastIndexOf'] as const).forEach(key => {
+    instrumentations[key] = function (this: unknown[], ...args: unknown[]) {
+      const arr = toRaw(this) as any
+      for (let i = 0, l = this.length; i < l; i++) {
+        track(arr, TrackOpTypes.GET, i + '')
+      }
+      // we run the method using the original args first (which may be reactive)
+      const res = arr[key](...args)
+      if (res === -1 || res === false) {
+        // if that didn't work, run it again using raw values.
+        return arr[key](...args.map(toRaw))
+      } else {
+        return res
+      }
+    }
+  })
+  // instrument length-altering mutation methods to avoid length being tracked
+  // which leads to infinite loops in some cases (#2137)
+  ;(['push', 'pop', 'shift', 'unshift', 'splice'] as const).forEach(key => {
+    instrumentations[key] = function (this: unknown[], ...args: unknown[]) {
+      // 暂停依赖收集
+      pauseTracking()
+      const res = (toRaw(this) as any)[key].apply(this, args)
+      // 恢复依赖收集
+      resetTracking()
+      return res
+    }
+  })
+  return instrumentations
+}
 
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Target, key: string | symbol, receiver: object) {
@@ -47,6 +87,10 @@ function createGetter(isReadonly = false, shallow = false) {
     // TODO: collection获取
     const targetIsArray = isArray(target)
 
+    if (!isReadonly && targetIsArray && hasOwn(arrayInstrumentations, key)) {
+      return Reflect.get(arrayInstrumentations, key, receiver)
+    }
+
     // 其它key的获取
     const res = Reflect.get(target, key, receiver)
 
@@ -70,8 +114,7 @@ function createGetter(isReadonly = false, shallow = false) {
     }
 
     if (isObject(res)) {
-      // readonly TODO
-      return isReadonly ? res : reactive(res)// isReadonly ?
+      return isReadonly ? readonly(res) : reactive(res)
     }
 
     return res
@@ -148,10 +191,37 @@ function has(target: object, key: string | symbol): boolean {
   return result
 }
 
+function ownKeys(target: object): (string | symbol)[] {
+  track(target, TrackOpTypes.ITERATE, isArray(target) ? 'length' : ITERATE_KEY)
+  return Reflect.ownKeys(target)
+}
+
 export const mutableHandlers: ProxyHandler<object> = {
   get,
   set,
   deleteProperty,
   has,
-  // ownKeys
+  ownKeys
+}
+
+export const readonlyHandlers: ProxyHandler<object> = {
+  get: readonlyGet,
+  set(target, key) {
+    if (__DEV__) {
+      warn(
+        `Set operation on key "${String(key)}" failed: target is readonly.`,
+        target
+      )
+    }
+    return true
+  },
+  deleteProperty(target, key) {
+    if (__DEV__) {
+      warn(
+        `Delete operation on key "${String(key)}" failed: target is readonly.`,
+        target
+      )
+    }
+    return true
+  }
 }
