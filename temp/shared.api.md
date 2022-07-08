@@ -5,6 +5,12 @@
 ```ts
 
 // @public (undocumented)
+export const capitalize: (str: string) => string;
+
+// @public (undocumented)
+export const def: (obj: object, key: string | symbol, value: any) => void;
+
+// @public (undocumented)
 export const extend: {
     <T, U>(target: T, source: U): T & U;
     <T_1, U_1, V>(target: T_1, source1: U_1, source2: V): T_1 & U_1 & V;
@@ -25,7 +31,13 @@ export const isArray: (arg: any) => arg is any[];
 export const isIntegerKey: (key: unknown) => boolean;
 
 // @public (undocumented)
+export const isMap: (val: unknown) => val is Map<any, any>;
+
+// @public (undocumented)
 export const isObject: (val: unknown) => val is Record<any, any>;
+
+// @public (undocumented)
+export const isSet: (val: unknown) => val is Set<any>;
 
 // @public (undocumented)
 export const isString: (val: unknown) => val is string;

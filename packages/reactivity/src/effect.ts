@@ -1,3 +1,4 @@
+import { isIntegerKey } from './../../shared/src/index';
 import { extend, isArray } from "@lite2uv/shared"
 import { isMap } from "util/types"
 import { ComputedRefImpl } from "./computed"
@@ -246,8 +247,13 @@ export function trigger(
         case TriggerOpTypes.ADD:
           if (!isArray(target)) {
             deps.push(depsMap.get(ITERATE_KEY))
+            if (isMap(target)) {
+              deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
+            }
+          } else if (isIntegerKey(key)) {
+            deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
           }
-          // TODO: array add
+
           break
         case TriggerOpTypes.SET:
           if(isMap(target)) {

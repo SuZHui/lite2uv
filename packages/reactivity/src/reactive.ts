@@ -1,6 +1,7 @@
-import { isObject, toRawType } from '@lite2uv/shared'
+import { def, isObject, toRawType } from '@lite2uv/shared'
 import { mutableHandlers, readonlyHandlers } from './baseHandlers'
-import { Ref, UnwrapRefSimple } from './ref'
+import { mutableCollectionHandlers, readonlyCollectionHandlers, shallowCollectionHandlers } from './collectionHandlers'
+import { RawSymbol, Ref, UnwrapRefSimple } from './ref'
 
 export const enum ReactiveFlags {
   SKIP = '__v_skip',
@@ -60,6 +61,7 @@ export function reactive<T extends object>(target: T) {
     target,
     false,
     mutableHandlers,
+    mutableCollectionHandlers,
     reactiveMap
   )
 }
@@ -97,6 +99,7 @@ export function readonly<T extends object>(
     target,
     true,
     readonlyHandlers,
+    readonlyCollectionHandlers,
     readonlyMap
   )
 }
@@ -105,6 +108,7 @@ function createReactiveObject(
   target: Target,
   isReadonly: boolean,
   baseHandlers: ProxyHandler<any>,
+  collectionHandlers: ProxyHandler<any>,
   proxyMap: WeakMap<Target, any>
 ): any {
   // target is already a Proxy, return it.
@@ -125,7 +129,7 @@ function createReactiveObject(
   if (targetType === TargetType.INVALID) {
     return target
   }
-  const proxy = new Proxy(target, baseHandlers)
+  const proxy = new Proxy(target, targetType === TargetType.COLLECTION ? collectionHandlers : baseHandlers)
   proxyMap.set(target, proxy)
   return proxy
 }
@@ -152,6 +156,13 @@ export function isProxy(value: unknown): boolean {
 export function toRaw<T>(observed: T): T {
   const raw = observed && (observed as Target)[ReactiveFlags.RAW]
   return raw ? toRaw(raw) : observed
+}
+
+export function markRaw<T extends object>(
+  value: T
+): T & { [RawSymbol]?: true } {
+  def(value, ReactiveFlags.SKIP, true)
+  return value
 }
 
 export const toReactive = <T extends unknown>(value: T) => isObject(value) ? reactive(value) : value

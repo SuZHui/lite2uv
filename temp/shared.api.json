@@ -172,6 +172,48 @@
       "members": [
         {
           "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!capitalize:var",
+          "docComment": "/**\n * @private\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "capitalize: "
+            },
+            {
+              "kind": "Content",
+              "text": "(str: string) => string"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "capitalize",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!def:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "def: "
+            },
+            {
+              "kind": "Content",
+              "text": "(obj: object, key: string | symbol, value: any) => void"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "def",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@lite2uv/shared!extend:var",
           "docComment": "",
           "excerptTokens": [
@@ -295,6 +337,45 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isMap:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isMap: "
+            },
+            {
+              "kind": "Content",
+              "text": "(val: unknown) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "val",
+              "canonicalReference": "@lite2uv/shared!~val"
+            },
+            {
+              "kind": "Content",
+              "text": " is "
+            },
+            {
+              "kind": "Reference",
+              "text": "Map",
+              "canonicalReference": "!Map:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any, any>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isMap",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@lite2uv/shared!isObject:var",
           "docComment": "",
           "excerptTokens": [
@@ -327,6 +408,45 @@
           ],
           "releaseTag": "Public",
           "name": "isObject",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isSet:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isSet: "
+            },
+            {
+              "kind": "Content",
+              "text": "(val: unknown) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "val",
+              "canonicalReference": "@lite2uv/shared!~val"
+            },
+            {
+              "kind": "Content",
+              "text": " is "
+            },
+            {
+              "kind": "Reference",
+              "text": "Set",
+              "canonicalReference": "!Set:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isSet",
           "variableTypeTokenRange": {
             "startIndex": 1,
             "endIndex": 6
