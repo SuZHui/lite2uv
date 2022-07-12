@@ -237,6 +237,9 @@ export function trigger(
     if (type === TriggerOpTypes.CLEAR) {
       // TODO: Map Set的clear操作
       // TODO: 设置 collection length 属性(修改数组长度)
+    } else if (key === 'length' && isArray(target)) {
+      // 修改数组长度的操作
+
     } else {
       // run SET | ADD | DELETE
       if (key !== void 0 /** undefined */ ) {
@@ -251,9 +254,9 @@ export function trigger(
               deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
             }
           } else if (isIntegerKey(key)) {
-            deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
+            // 数组长度的修改
+            deps.push(depsMap.get('length'))
           }
-
           break
         case TriggerOpTypes.SET:
           if(isMap(target)) {

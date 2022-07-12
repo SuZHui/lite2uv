@@ -55,6 +55,7 @@ function getTargetType(value: Target) {
 // only unwrap nested ref
 export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRefSimple<T>
 
+export function reactive<T extends object>(target: T): UnwrapNestedRefs<T>
 export function reactive<T extends object>(target: T) {
   if (isReadonly(target)) return target
   return createReactiveObject(
@@ -129,7 +130,12 @@ function createReactiveObject(
   if (targetType === TargetType.INVALID) {
     return target
   }
-  const proxy = new Proxy(target, targetType === TargetType.COLLECTION ? collectionHandlers : baseHandlers)
+  const proxy = new Proxy(
+    target,
+    targetType === TargetType.COLLECTION
+      ? collectionHandlers
+      : baseHandlers
+  )
   proxyMap.set(target, proxy)
   return proxy
 }

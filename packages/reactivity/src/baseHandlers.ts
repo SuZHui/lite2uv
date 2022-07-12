@@ -84,7 +84,7 @@ function createGetter(isReadonly = false, shallow = false) {
     ) {
       return target
     }
-    // TODO: collection获取
+
     const targetIsArray = isArray(target)
 
     if (!isReadonly && targetIsArray && hasOwn(arrayInstrumentations, key)) {
