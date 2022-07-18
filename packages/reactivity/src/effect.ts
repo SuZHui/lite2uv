@@ -239,7 +239,11 @@ export function trigger(
       // TODO: 设置 collection length 属性(修改数组长度)
     } else if (key === 'length' && isArray(target)) {
       // 修改数组长度的操作
-
+      depsMap.forEach((dep, key) => {
+        if (key === 'length' || key >= (newValue as number)) {
+          deps.push(dep)
+        }
+      })
     } else {
       // run SET | ADD | DELETE
       if (key !== void 0 /** undefined */ ) {
