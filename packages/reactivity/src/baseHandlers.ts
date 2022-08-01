@@ -1,7 +1,7 @@
 import { Target, ReactiveFlags, reactiveMap, shallowReactiveMap, shallowReadonlyMap, readonlyMap, reactive, isReadonly, isShallow, toRaw, readonly } from './reactive'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
 import { isRef } from './ref'
-import { hasChanged, hasOwn, isArray, isIntegerKey, isObject, isSymbol, makeMap } from '@lite2uv/shared'
+import { extend, hasChanged, hasOwn, isArray, isIntegerKey, isObject, isSymbol, makeMap } from '@lite2uv/shared'
 import { trigger, track, ITERATE_KEY, pauseTracking, resetTracking } from './effect'
 import { warn } from './warning'
 
@@ -19,6 +19,7 @@ const builtInSymbols = new Set(
 )
 
 const get =  /*#__PURE__*/ createGetter()
+const shallowGet = /*#__PURE__*/ createGetter(false, true)
 const readonlyGet = /*#__PURE__*/ createGetter(true)
 
 const arrayInstrumentations = createArrayInstrumentations()
@@ -121,7 +122,8 @@ function createGetter(isReadonly = false, shallow = false) {
   }
 }
 
-const set = createSetter()
+const set = /*#__PURE__*/ createSetter()
+const shallowSet = /*#__PURE__*/ createSetter(true)
 
 function createSetter(shallow = false) {
   return function set(
@@ -225,3 +227,12 @@ export const readonlyHandlers: ProxyHandler<object> = {
     return true
   }
 }
+
+export const shallowReactiveHandlers = /*#__PURE__*/ extend(
+  {},
+  mutableHandlers,
+  {
+    get: shallowGet,
+    set: shallowSet
+  }
+)

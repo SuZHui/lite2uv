@@ -1,5 +1,4 @@
-import { isIntegerKey } from './../../shared/src/index';
-import { extend, isArray } from "@lite2uv/shared"
+import { extend, isArray, isIntegerKey } from "@lite2uv/shared"
 import { isMap } from "util/types"
 import { ComputedRefImpl } from "./computed"
 import { createDep, Dep, finalizeDepMarkers, initDepMarkers, newTracked, wasTracked } from "./dep"
@@ -146,9 +145,47 @@ function cleanupEffect(effect: ReactiveEffect) {
   }
 }
 
-export function effect<T = any>(fn: () => T) {
+export interface DebuggerOptions {
+  onTrack?: (event: DebuggerEvent) => void
+  onTrigger?: (event: DebuggerEvent) => void
+}
+
+export interface ReactiveEffectOptions extends DebuggerOptions {
+  lazy?: boolean
+  scheduler?: EffectScheduler
+  // TODO: scope?: EffectScope
+  allowRecurse?: boolean
+  onStop?: () => void
+}
+
+export interface ReactiveEffectRunner<T = any> {
+  (): T
+  effect: ReactiveEffect
+}
+
+export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
+  if ((fn as ReactiveEffectRunner).effect) {
+    fn = (fn as ReactiveEffectRunner).effect.fn
+  }
+
   const _effect = new ReactiveEffect(fn)
-  _effect.run()
+
+  if (options) {
+    // 将options的属性绑定至effect对象
+    extend(_effect, options)
+    // TODO: if (options.scope) recordEffectScope(_effect, options.scope)
+  }
+
+  if (!options || !options.lazy) {
+    _effect.run()
+  }
+  const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
+  runner.effect = _effect
+  return runner
+}
+
+export function stop(runner: ReactiveEffectRunner) {
+  runner.effect.stop()
 }
 
 export let shouldTrack = true

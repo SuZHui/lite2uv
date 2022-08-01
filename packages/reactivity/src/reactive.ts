@@ -1,5 +1,5 @@
 import { def, isObject, toRawType } from '@lite2uv/shared'
-import { mutableHandlers, readonlyHandlers } from './baseHandlers'
+import { mutableHandlers, readonlyHandlers, shallowReactiveHandlers } from './baseHandlers'
 import { mutableCollectionHandlers, readonlyCollectionHandlers, shallowCollectionHandlers } from './collectionHandlers'
 import { RawSymbol, Ref, UnwrapRefSimple } from './ref'
 
@@ -68,6 +68,23 @@ export function reactive<T extends object>(target: T) {
 }
 
 export declare const ShallowReactiveMarker: unique symbol
+
+export type ShallowReactive<T> = T & { [ShallowReactiveMarker]?: true }
+
+/**
+ * Return a shallowly-reactive copy of the original object, where only the root
+ * level properties are reactive. It also does not auto-unwrap refs (even at the
+ * root level).
+ */
+export function shallowReactive<T extends object>(target: T) {
+  return createReactiveObject(
+    target,
+    false,
+    shallowReactiveHandlers,
+    shallowCollectionHandlers,
+    shallowReactiveMap
+  )
+}
 
 type Primitive = string | number | boolean | bigint | symbol | undefined | null
 type Builtin = Primitive | Function | Date | Error | RegExp
