@@ -28,6 +28,9 @@ export const hasOwn: (val: object, key: string | symbol) => key is never;
 export const isArray: (arg: any) => arg is any[];
 
 // @public (undocumented)
+export const isFunction: (val: unknown) => val is Function;
+
+// @public (undocumented)
 export const isIntegerKey: (key: unknown) => boolean;
 
 // @public (undocumented)
@@ -47,6 +50,9 @@ export const isSymbol: (val: unknown) => val is symbol;
 
 // @public
 export function makeMap(str: string, expectsLowerCase?: boolean): (key: string) => boolean;
+
+// @public (undocumented)
+export const NOOP: () => void;
 
 // @public (undocumented)
 export const objectToString: () => string;

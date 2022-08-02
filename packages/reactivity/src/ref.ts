@@ -63,7 +63,7 @@ export function isRef(r: any): r is Ref {
 // export function ref<T extends object>(
 //   value: T
 // ): [T] extends [Ref] ? T : Ref<UnwrapRef<T>>
-// export function ref<T>(value: T): Ref<UnwrapRef<T>>
+export function ref<T>(value: T): Ref<UnwrapRef<T>>
 export function ref<T = any>(value: T): Ref<T | undefined>
 export function ref(value?: unknown) {
   return createRef(value, false)

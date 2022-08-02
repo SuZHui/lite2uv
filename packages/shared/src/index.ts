@@ -2,6 +2,8 @@ import { makeMap } from './makeMap'
 
 export { makeMap }
 
+export const NOOP = () => {}
+
 export const extend = Object.assign
 
 const hasOwnProperty = Object.prototype.hasOwnProperty
@@ -19,6 +21,9 @@ export const isMap = (val: unknown): val is Map<any, any> =>
   toTypeString(val) === '[object Map]'
 export const isSet = (val: unknown): val is Set<any> =>
   toTypeString(val) === '[object Set]'
+
+export const isFunction = (val: unknown): val is Function =>
+  typeof val === 'function'
 
 export const isObject = (val: unknown): val is Record<any, any> =>
   val !== null && typeof val === 'object'

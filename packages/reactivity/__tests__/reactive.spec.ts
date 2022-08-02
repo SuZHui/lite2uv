@@ -1,6 +1,5 @@
-import { effect } from '../src/effect'
-import { reactive, isReactive, toRaw } from '../src/reactive'
-import { isRef, ref } from '../src/ref'
+import { computed, effect, isReactive, isRef, reactive, ref, toRaw } from "../src"
+
 
 describe('reactivity/reactive', () => {
   it('Object', () => {
@@ -44,7 +43,7 @@ describe('reactivity/reactive', () => {
     expect(isReactive(observed.array[0])).toBe(true)
   })
 
-  it.skip('observing subtypes of IterableCollections(Map, Set)', () => {
+  it('observing subtypes of IterableCollections(Map, Set)', () => {
     // subtypes of Map
     class CustomMap extends Map {}
     const cmap = reactive(new CustomMap())
@@ -71,7 +70,7 @@ describe('reactivity/reactive', () => {
     expect(dummy).toBe(false)
   })
 
-  it.skip('observing subtypes of WeakCollections(WeakMap, WeakSet)', () => {
+  it('observing subtypes of WeakCollections(WeakMap, WeakSet)', () => {
     // subtypes of WeakMap
     class CustomMap extends WeakMap {}
     const cmap = reactive(new CustomMap())
@@ -164,7 +163,7 @@ describe('reactivity/reactive', () => {
     expect(toRaw(original)).toBe(original)
   })
 
-  test('toRaw on object using reactive as prototype', () => {
+  it('toRaw on object using reactive as prototype', () => {
     const original = reactive({})
     const obj = Object.create(original)
     const raw = toRaw(obj)
@@ -172,7 +171,7 @@ describe('reactivity/reactive', () => {
     expect(raw).not.toBe(toRaw(original))
   })
 
-  it.skip('should not unwrap Ref<T>', () => {
+  it('should not unwrap Ref<T>', () => {
     const observedNumberRef = reactive(ref(1))
     const observedObjectRef = reactive(ref({ foo: 1 }))
 
@@ -180,36 +179,35 @@ describe('reactivity/reactive', () => {
     expect(isRef(observedObjectRef)).toBe(true)
   })
 
-  // it.skip('should unwrap computed refs', () => {
-  //   // readonly
-  //   const a = computed(() => 1)
-  //   // writable
-  //   const b = computed({
-  //     get: () => 1,
-  //     set: () => {}
-  //   })
-  //   const obj = reactive({ a, b })
-  //   // check type
-  //   obj.a + 1
-  //   obj.b + 1
-  //   expect(typeof obj.a).toBe(`number`)
-  //   expect(typeof obj.b).toBe(`number`)
-  // })
+  it('should unwrap computed refs', () => {
+    // readonly
+    const a = computed(() => 1)
+    // writable
+    const b = computed({
+      get: () => 1,
+      set: () => {}
+    })
+    const obj = reactive({ a, b })
+    // check type
+    obj.a + 1
+    obj.b + 1
+    expect(typeof obj.a).toBe(`number`)
+    expect(typeof obj.b).toBe(`number`)
+  })
 
-  // it('should allow setting property from a ref to another ref', () => {
-  //   const foo = ref(0)
-  //   const bar = ref(1)
-  //   const observed = reactive({ a: foo })
-  //   const dummy = computed(() => observed.a)
-  //   expect(dummy.value).toBe(0)
+  it('should allow setting property from a ref to another ref', () => {
+    const foo = ref(0)
+    const bar = ref(1)
+    const observed = reactive({ a: foo })
+    const dummy = computed(() => observed.a)
+    expect(dummy.value).toBe(0)
 
-  //   // @ts-ignore
-  //   observed.a = bar
-  //   expect(dummy.value).toBe(1)
+    // @ts-ignore
+    observed.a = bar
+    expect(dummy.value).toBe(1)
 
-  //   bar.value++
-  //   expect(dummy.value).toBe(2)
-  // })
+    bar.value++
+    expect(dummy.value).toBe(2)
+  })
 
-  
 })

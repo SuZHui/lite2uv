@@ -316,6 +316,41 @@
         },
         {
           "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!isFunction:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isFunction: "
+            },
+            {
+              "kind": "Content",
+              "text": "(val: unknown) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "val",
+              "canonicalReference": "@lite2uv/shared!~val"
+            },
+            {
+              "kind": "Content",
+              "text": " is "
+            },
+            {
+              "kind": "Reference",
+              "text": "Function",
+              "canonicalReference": "!Function:interface"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "isFunction",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Variable",
           "canonicalReference": "@lite2uv/shared!isIntegerKey:var",
           "docComment": "",
           "excerptTokens": [
@@ -571,6 +606,27 @@
             }
           ],
           "name": "makeMap"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@lite2uv/shared!NOOP:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "NOOP: "
+            },
+            {
+              "kind": "Content",
+              "text": "() => void"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "NOOP",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
         },
         {
           "kind": "Variable",
