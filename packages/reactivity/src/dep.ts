@@ -1,4 +1,4 @@
-import { ReactiveEffect, trackOpBit } from "./effect"
+import { ReactiveEffect, trackOpBit } from './effect'
 
 export type Dep = Set<ReactiveEffect> & TrackedMarkers
 

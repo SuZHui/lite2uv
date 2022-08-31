@@ -1,8 +1,8 @@
-import { isFunction, NOOP } from "@lite2uv/shared"
-import { Dep } from "./dep";
-import { DebuggerOptions, ReactiveEffect } from "./effect";
-import { ReactiveFlags, toRaw } from "./reactive";
-import { Ref, trackRefValue, triggerRefValue } from "./ref";
+import { isFunction, NOOP } from '@lite2uv/shared'
+import { Dep } from './dep';
+import { DebuggerOptions, ReactiveEffect } from './effect';
+import { ReactiveFlags, toRaw } from './reactive';
+import { Ref, trackRefValue, triggerRefValue } from './ref';
 
 declare const ComputedRefSymbol: unique symbol
 

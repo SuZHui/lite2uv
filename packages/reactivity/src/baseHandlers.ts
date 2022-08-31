@@ -5,7 +5,7 @@ import { extend, hasChanged, hasOwn, isArray, isIntegerKey, isObject, isSymbol, 
 import { trigger, track, ITERATE_KEY, pauseTracking, resetTracking } from './effect'
 import { warn } from './warning'
 
-const isNonTrackableKeys = /*#__PURE__*/ makeMap(`__proto__,__v_isRef,__isVue`)
+const isNonTrackableKeys = /*#__PURE__*/ makeMap('__proto__,__v_isRef,__isVue')
 
 const builtInSymbols = new Set(
   /*#__PURE__*/

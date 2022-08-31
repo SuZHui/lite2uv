@@ -1,7 +1,7 @@
-import { capitalize, hasChanged, hasOwn, isMap, toRawType } from "@lite2uv/shared";
-import { ITERATE_KEY, MAP_KEY_ITERATE_KEY, track, trigger } from "./effect";
-import { TrackOpTypes, TriggerOpTypes } from "./operations";
-import { ReactiveFlags, toRaw, toReactive, toReadonly } from "./reactive";
+import { capitalize, hasChanged, hasOwn, isMap, toRawType } from '@lite2uv/shared';
+import { ITERATE_KEY, MAP_KEY_ITERATE_KEY, track, trigger } from './effect';
+import { TrackOpTypes, TriggerOpTypes } from './operations';
+import { ReactiveFlags, toRaw, toReactive, toReadonly } from './reactive';
 
 export type CollectionTypes = IterableCollections | WeakCollections;
 
@@ -219,7 +219,7 @@ function createIterableMethod(
 function createReadonlyMethod(type: TriggerOpTypes): Function {
   return function (this: CollectionTypes, ...args: unknown[]) {
     if (__DEV__) {
-      const key = args[0] ? `on key "${args[0]}" ` : ``
+      const key = args[0] ? `on key "${args[0]}" ` : ''
       console.warn(
         `${capitalize(type)} operation ${key}failed: target is readonly.`,
         toRaw(this)
@@ -392,10 +392,10 @@ function checkIdentityKeys(
     const type = toRawType(target)
     console.warn(
       `Reactive ${type} contains both the raw and reactive ` +
-      `versions of the same object${type === `Map` ? ` as keys` : ``}, ` +
-      `which can lead to inconsistencies. ` +
-      `Avoid differentiating between the raw and reactive versions ` +
-      `of an object and only use the reactive version if possible.`
+      `versions of the same object${type === 'Map' ? ' as keys' : ''}, ` +
+      'which can lead to inconsistencies. ' +
+      'Avoid differentiating between the raw and reactive versions ' +
+      'of an object and only use the reactive version if possible.'
     )
   }
 }

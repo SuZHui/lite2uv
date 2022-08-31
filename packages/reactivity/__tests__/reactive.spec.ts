@@ -1,4 +1,4 @@
-import { computed, effect, isReactive, isRef, reactive, ref, toRaw } from "../src"
+import { computed, effect, isReactive, isRef, reactive, ref, toRaw } from '../src'
 
 
 describe('reactivity/reactive', () => {
@@ -191,8 +191,8 @@ describe('reactivity/reactive', () => {
     // check type
     obj.a + 1
     obj.b + 1
-    expect(typeof obj.a).toBe(`number`)
-    expect(typeof obj.b).toBe(`number`)
+    expect(typeof obj.a).toBe('number')
+    expect(typeof obj.b).toBe('number')
   })
 
   it('should allow setting property from a ref to another ref', () => {

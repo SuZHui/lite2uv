@@ -1,8 +1,8 @@
-import { extend, isArray, isIntegerKey } from "@lite2uv/shared"
-import { isMap } from "util/types"
-import { ComputedRefImpl } from "./computed"
-import { createDep, Dep, finalizeDepMarkers, initDepMarkers, newTracked, wasTracked } from "./dep"
-import { TrackOpTypes, TriggerOpTypes } from "./operations"
+import { extend, isArray, isIntegerKey } from '@lite2uv/shared'
+import { isMap } from 'util/types'
+import { ComputedRefImpl } from './computed'
+import { createDep, Dep, finalizeDepMarkers, initDepMarkers, newTracked, wasTracked } from './dep'
+import { TrackOpTypes, TriggerOpTypes } from './operations'
 
 // The main WeakMap that stores {target -> key -> dep} connections.
 // Conceptually, it's easier to think of a dependency as a Dep class
