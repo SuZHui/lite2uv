@@ -6,6 +6,8 @@ module.exports = {
   parserOptions: {
     sourceType: 'module',
   },
+  // ignore js files
+  ignorePatterns: ['*.js'],
   plugins: ['jest'],
   rules: {
     'quotes': ['error', 'single'],

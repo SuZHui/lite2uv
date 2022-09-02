@@ -5,11 +5,11 @@
   "description": "lite vue demo",
   "main": "index.js",
   "scripts": {
-    "dev:shared": "node scripts/dev.mjs shared --f cjs",
+    "dev:shared": "node scripts/dev.js shared --f cjs",
     "lint": "eslint --ext .ts packages/*/{src,__tests__}/**.ts",
     "test": "jest",
-    "build:reactivity": "node scripts/build.mjs reactivity",
-    "build:shared": "node scripts/build.mjs shared -t"
+    "build:reactivity": "node scripts/build.js reactivity",
+    "build:shared": "node scripts/build.js shared -t"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/SuZHui/lite2uv#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.23.0",
+    "@microsoft/api-extractor": "^7.29.5",
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.25",
     "@typescript-eslint/parser": "^5.36.1",
