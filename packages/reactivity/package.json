@@ -10,6 +10,6 @@
   "author": "suzh",
   "license": "ISC",
   "dependencies": {
-    "@lite2uv/shared": "workspace:^0.0.1"
+    "@lite2uv/shared": "0.0.1"
   }
 }

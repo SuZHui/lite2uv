@@ -38,7 +38,7 @@ importers:
 
   packages/reactivity:
     specifiers:
-      '@lite2uv/shared': workspace:^0.0.1
+      '@lite2uv/shared': 0.0.1
     dependencies:
       '@lite2uv/shared': link:../shared
 
