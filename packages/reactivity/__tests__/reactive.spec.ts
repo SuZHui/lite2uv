@@ -1,6 +1,5 @@
 import { computed, effect, isReactive, isRef, reactive, ref, toRaw } from '../src'
 
-
 describe('reactivity/reactive', () => {
   it('Object', () => {
     const original = { foo: 1 }

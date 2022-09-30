@@ -41,6 +41,7 @@ build({
   format: outputFormat,
   define: {
     __VERSION__: `"${pkg.version}"`,
+    __DEV__: 'true',
   },
   watch: {
     onRebuild(error) {

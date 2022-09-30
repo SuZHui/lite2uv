@@ -1,5 +1,7 @@
 import { makeMap } from './makeMap'
 
+export * from './typeUtils'
+
 export { makeMap }
 
 export const NOOP = () => {}

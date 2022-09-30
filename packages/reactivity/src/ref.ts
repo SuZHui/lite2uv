@@ -1,5 +1,5 @@
-import { hasChanged } from '@lite2uv/shared'
-import { toReactive, toRaw, ShallowReactiveMarker } from './reactive'
+import { hasChanged, IfAny, isArray } from '@lite2uv/shared'
+import { toReactive, toRaw, ShallowReactiveMarker, isProxy } from './reactive'
 import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
 import { createDep, Dep } from './dep'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
@@ -64,7 +64,7 @@ export function isRef(r: any): r is Ref {
 //   value: T
 // ): [T] extends [Ref] ? T : Ref<UnwrapRef<T>>
 export function ref<T>(value: T): Ref<UnwrapRef<T>>
-export function ref<T = any>(value: T): Ref<T | undefined>
+export function ref<T = any>(): Ref<T | undefined>
 export function ref(value?: unknown) {
   return createRef(value, false)
 }
@@ -115,6 +115,109 @@ class RefImpl<T> {
       triggerRefValue(this, newVal)
     }
   }
+}
+
+export function triggerRef(ref: Ref) {
+  triggerRefValue(ref, __DEV__ ? ref.value : void 0)
+}
+
+export function unref<T>(ref: T | Ref<T>): T {
+  return isRef(ref) ? (ref.value as any) : ref
+}
+
+export type CustomRefFactory<T> = (
+  track: () => void,
+  trigger: () => void
+) => {
+  get: () => T
+  set: (value: T) => void
+}
+
+class CustomRefImpl<T> {
+  public dep?: Dep = undefined
+
+  private readonly _get: ReturnType<CustomRefFactory<T>>['get']
+  private readonly _set: ReturnType<CustomRefFactory<T>>['set']
+
+  public readonly __v_isRef = true
+
+  constructor(factory: CustomRefFactory<T>) {
+    const { get, set } = factory(
+      () => trackRefValue(this),
+      () => triggerRefValue(this)
+    )
+    this._get = get
+    this._set = set
+  }
+
+  get value() {
+    return this._get()
+  }
+
+  set value(newVal) {
+    this._set(newVal)
+  }
+}
+
+export function customRef<T>(factory: CustomRefFactory<T>): Ref<T> {
+  return new CustomRefImpl(factory) as any
+}
+
+export type ToRefs<T = any> = {
+  [K in keyof T]: ToRef<T[K]>
+}
+export function toRefs<T extends object>(object: T): ToRefs<T> {
+  if (__DEV__ && !isProxy(object)) {
+    console.warn('toRefs() expects a reactive object but received a plain one.')
+  }
+  const ret: any = isArray(object) ? new Array(object.length) : {}
+  for (const key in object) {
+    ret[key] = toRef(object, key)
+  }
+  return ret
+}
+
+class ObjectRefImpl<T extends object, K extends keyof T> {
+  public readonly __v_isRef = true
+
+  constructor(
+    private readonly _object: T,
+    private readonly _key: K,
+    private readonly _defaultValue?: T[K]
+  ) {}
+
+  get value() {
+    const val = this._object[this._key]
+    return val === undefined ? (this._defaultValue as T[K]) : val
+  }
+
+  set value(newVal) {
+    this._object[this._key] = newVal
+  }
+}
+
+export type ToRef<T> = IfAny<T, Ref<T>, [T] extends [Ref] ? T : Ref<T>>
+
+export function toRef<T extends object, K extends keyof T>(
+  object: T,
+  key: K
+): ToRef<T[K]>
+
+export function toRef<T extends object, K extends keyof T>(
+  object: T,
+  key: K,
+  defaultValue: T[K]
+): ToRef<Exclude<T[K], undefined>>
+
+export function toRef<T extends object, K extends keyof T>(
+  object: T,
+  key: K,
+  defaultValue?: T[K]
+): ToRef<T[K]> {
+  const val = object[key]
+  return isRef(val)
+    ? val
+    : (new ObjectRefImpl(object, key, defaultValue) as any)
 }
 
 // corner case when use narrows type
