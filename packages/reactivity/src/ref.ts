@@ -1,5 +1,5 @@
 import { hasChanged, IfAny, isArray } from '@lite2uv/shared'
-import { toReactive, toRaw, ShallowReactiveMarker, isProxy } from './reactive'
+import { toReactive, toRaw, ShallowReactiveMarker, isProxy, isReadonly, isShallow } from './reactive'
 import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
 import { createDep, Dep } from './dep'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
@@ -102,16 +102,18 @@ class RefImpl<T> {
   }
 
   get value() {
-    // TODO: 收集ref依赖
+    // 收集ref依赖
     trackRefValue(this)
     return this._value
   }
 
   set value(newVal) {
-    newVal = this.__v_isShallow ? newVal : toRaw(newVal)
+    const useDirectValue =
+      this.__v_isShallow || isShallow(newVal) || isReadonly(newVal)
+    newVal = useDirectValue ? newVal : toRaw(newVal)
     if (hasChanged(newVal, this._rawValue)) {
       this._rawValue = newVal
-      this._value = this.__v_isShallow ? newVal : toReactive(newVal)
+      this._value = useDirectValue ? newVal : toReactive(newVal)
       triggerRefValue(this, newVal)
     }
   }

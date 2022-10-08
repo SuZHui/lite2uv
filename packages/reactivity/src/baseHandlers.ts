@@ -21,6 +21,7 @@ const builtInSymbols = new Set(
 const get =  /*#__PURE__*/ createGetter()
 const shallowGet = /*#__PURE__*/ createGetter(false, true)
 const readonlyGet = /*#__PURE__*/ createGetter(true)
+const shallowReadonlyGet = /*#__PURE__*/ createGetter(true, true)
 
 const arrayInstrumentations = createArrayInstrumentations()
 
@@ -234,5 +235,16 @@ export const shallowReactiveHandlers = /*#__PURE__*/ extend(
   {
     get: shallowGet,
     set: shallowSet
+  }
+)
+
+// Props handlers are special in the sense that it should not unwrap top-level
+// refs (in order to allow refs to be explicitly passed down), but should
+// retain the reactivity of the normal readonly object.
+export const shallowReadonlyHandlers = /*#__PURE__*/ extend(
+  {},
+  readonlyHandlers,
+  {
+    get: shallowReadonlyGet
   }
 )

@@ -1,6 +1,6 @@
 import { def, isObject, toRawType } from '@lite2uv/shared'
-import { mutableHandlers, readonlyHandlers, shallowReactiveHandlers } from './baseHandlers'
-import { mutableCollectionHandlers, readonlyCollectionHandlers, shallowCollectionHandlers } from './collectionHandlers'
+import { mutableHandlers, readonlyHandlers, shallowReactiveHandlers, shallowReadonlyHandlers } from './baseHandlers'
+import { mutableCollectionHandlers, readonlyCollectionHandlers, shallowCollectionHandlers, shallowReadonlyCollectionHandlers } from './collectionHandlers'
 import { RawSymbol, Ref, UnwrapRefSimple } from './ref'
 
 export const enum ReactiveFlags {
@@ -76,7 +76,7 @@ export type ShallowReactive<T> = T & { [ShallowReactiveMarker]?: true }
  * level properties are reactive. It also does not auto-unwrap refs (even at the
  * root level).
  */
-export function shallowReactive<T extends object>(target: T) {
+export function shallowReactive<T extends object>(target: T): ShallowReactive<T> {
   return createReactiveObject(
     target,
     false,
@@ -119,6 +119,22 @@ export function readonly<T extends object>(
     readonlyHandlers,
     readonlyCollectionHandlers,
     readonlyMap
+  )
+}
+
+/**
+ * Returns a reactive-copy of the original object, where only the root level
+ * properties are readonly, and does NOT unwrap refs nor recursively convert
+ * returned properties.
+ * This is used for creating the props proxy object for stateful components.
+ */
+ export function shallowReadonly<T extends object>(target: T): Readonly<T> {
+  return createReactiveObject(
+    target,
+    true,
+    shallowReadonlyHandlers,
+    shallowReadonlyCollectionHandlers,
+    shallowReadonlyMap
   )
 }
 

@@ -274,6 +274,7 @@ export function trigger(
     if (type === TriggerOpTypes.CLEAR) {
       // TODO: Map Set的clear操作
       // TODO: 设置 collection length 属性(修改数组长度)
+      deps = [...depsMap.values()]
     } else if (key === 'length' && isArray(target)) {
       // 修改数组长度的操作
       depsMap.forEach((dep, key) => {
@@ -297,6 +298,14 @@ export function trigger(
           } else if (isIntegerKey(key)) {
             // 数组长度的修改
             deps.push(depsMap.get('length'))
+          }
+          break
+        case TriggerOpTypes.DELETE:
+          if (!isArray(target)) {
+            deps.push(depsMap.get(ITERATE_KEY))
+            if (isMap(target)) {
+              deps.push(depsMap.get(MAP_KEY_ITERATE_KEY))
+            }
           }
           break
         case TriggerOpTypes.SET:
